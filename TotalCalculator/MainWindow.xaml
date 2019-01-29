@@ -4,9 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TotalCalculator"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        mc:Ignorable="d" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="319.622" Width="525">
     <Grid>
-        
+        <Label Content="Total Money" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="70" Margin="10,30" Foreground="DodgerBlue"/>
+        <Label x:Name="label" Content="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="70" Margin="0,0,0,50"/>
+        <Label x:Name="status" Content="waiting for phones ..." HorizontalAlignment="Center" Margin="0,0,0,16" VerticalAlignment="Bottom" FontSize="8"
+               Foreground="Red"/>
+
     </Grid>
 </Window>
