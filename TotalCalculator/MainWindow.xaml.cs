@@ -34,7 +34,7 @@ namespace TotalCalculator
         double touchDifference = 1 - (1105.0 / 1500);
         double alfaDifference = 1 - (1115.0 / 1500);
 
-        int losses = 600;  // in $
+        int losses = 1000;  // in $
 
         public MainWindow()
         {
@@ -49,6 +49,24 @@ namespace TotalCalculator
             double savings = 0;
             double jaroor1 = 0;
 
+            DateTime dateSavedImage;
+            if (DateTime.Now.Hour < 21)
+            {
+                dateSavedImage = DateTime.Now.AddDays(-1);
+            }
+            else
+            {
+                dateSavedImage = DateTime.Now;
+            }
+
+            if (dateSavedImage.DayOfWeek == DayOfWeek.Sunday)
+            {
+                labelTotal.Foreground = Brushes.DarkGreen;
+                labelTotal.FontStyle = FontStyles.Italic;
+            }
+
+            labelDate.Content = string.Format("{0:00}-{1:00}-{2}", dateSavedImage.Day, dateSavedImage.Month, dateSavedImage.Year);
+
             Task t = Task.Run(() =>
             {
 
@@ -61,8 +79,26 @@ namespace TotalCalculator
                 this.Dispatcher.Invoke(() =>
                 {
                     totalDolarat += phone2;
-                    label.Content = totalDolarat.ToString("C2");
+                    labelTotal.Content = totalDolarat.ToString("C2");
                     status.Content = "Done";
+
+                    string pathPictureFormat = string.Format("{0}-{1}-{2}", dateSavedImage.Year, dateSavedImage.Month, dateSavedImage.Day);
+
+                    mainGrid.Background = Brushes.White;
+                    mainGrid.UpdateLayout();
+                    //mainGrid.Measure(new Size(510, 282));
+                    //mainGrid.Arrange(new Rect(0, 0, 510, 282));
+
+                    FileStream stream = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + pathPictureFormat + ".png", FileMode.Create);
+                    RenderTargetBitmap image = new RenderTargetBitmap(525, 300, 96, 96, PixelFormats.Default);
+                    image.Render(mainGrid);
+
+                    BitmapFrame fr = BitmapFrame.Create(image);
+
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(fr);
+                    encoder.Save(stream);
+                    stream.Dispose();
                 });
 
                 //cleanup
@@ -89,7 +125,7 @@ namespace TotalCalculator
 
             string Data = File.ReadAllText(dolaratPath);
             MatchCollection matches;
-            matches = Regex.Matches(Data, @"total   = (\d{1,4}(?:\.\d{1,2})?)", RegexOptions.Singleline);
+            matches = Regex.Matches(Data, @"total   = (\d{1,5}(?:\.\d{1,2})?)", RegexOptions.Singleline);
             totalDolarat = double.Parse(matches[matches.Count - 1].Groups[1].Value);
             matches = Regex.Matches(Data, @"(\d{1,4}(?:\.\d{1,2})?)\(MTC\) \+ (\d{1,4}(?:\.\d{1,2})?)\(Alfa\)", RegexOptions.Singleline);
             touchDollars = double.Parse(matches[matches.Count - 1].Groups[1].Value);
@@ -107,16 +143,16 @@ namespace TotalCalculator
             savings += double.Parse(mat.Groups[2].Value);
             savings += double.Parse(mat.Groups[3].Value);
 
-            Data = File.ReadAllLines(jaroor1Path).Last();
-            mat = Regex.Match(Data, @"\= (\d{2,4})");
-            jaroor1 = double.Parse(mat.Groups[1].Value);
-            jaroor1 += 70;
-            jaroor1 /= 1.5;
+            //Data = File.ReadAllLines(jaroor1Path).Last();
+            //mat = Regex.Match(Data, @"\= (\d{2,4})");
+            //jaroor1 = double.Parse(mat.Groups[1].Value);
+            //jaroor1 += 40;
+            //jaroor1 /= 1.5;
 
 
             totalDolarat = totalDolarat + phone1 + savings + jaroor1;
 
-            label.Content = totalDolarat.ToString("C2");
+            labelTotal.Content = totalDolarat.ToString("C2");
 
         }
     }

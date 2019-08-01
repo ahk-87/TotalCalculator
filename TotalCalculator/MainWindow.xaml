@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:TotalCalculator"
         mc:Ignorable="d" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen"
         Title="MainWindow" Height="319.622" Width="525">
-    <Grid>
-        <Label Content="Total Money" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="70" Margin="10,30" Foreground="DodgerBlue"/>
-        <Label x:Name="label" Content="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="70" Margin="0,0,0,50"/>
+    <Grid Name="mainGrid">
+        <Label x:Name="labelDate" Content="Total Money" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="30" Margin="10,14" Foreground="Brown" />
+        <Label Content="Total Money" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="70" Margin="10,55" Foreground="DodgerBlue"/>
+        <Label x:Name="labelTotal" Content="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="70" Margin="0,0,0,40"/>
         <Label x:Name="status" Content="waiting for phones ..." HorizontalAlignment="Center" Margin="0,0,0,16" VerticalAlignment="Bottom" FontSize="8"
                Foreground="Red"/>
 
