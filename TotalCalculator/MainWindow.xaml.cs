@@ -31,14 +31,41 @@ namespace TotalCalculator
         string dolaratPath = @"D:\Dropbox\Grandstream new\Progs\JaroorDolarat.txt";
         string jaroor1Path = @"D:\Dropbox\Text Files\globe7 accounts.txt";
 
-        double touchDifference = 1 - (1105.0 / 1500);
-        double alfaDifference = 1 - (1115.0 / 1500);
+        string pricesPath = @"D:\Dropbox\Text Files\callingDollarPrice.txt";
 
-        int losses = 1000;  // in $
+        // this difference is for ayam 16000
+        //double touchDifference = 1 - (1105.0 / 1500);
+        //double alfaDifference = 1 - (1115.0 / 1500);
+
+
+        int touchAyamPrice = 17000;
+        int alfaAyamPrice = 15000;
+        int dollarRate = 1515;
+        double touchDifference;
+        double alfaDifference;
+
+        int losses = 200;  // in $
 
         public MainWindow()
         {
             InitializeComponent();
+            if (File.Exists(pricesPath))
+            {
+                string[] lines = File.ReadAllLines(pricesPath);
+                Dictionary<string, string> prices = new Dictionary<string, string>();
+                foreach (string l in lines)
+                {
+                    string[] values = l.Split(new char[] { '=' });
+                    prices.Add(values[0], values[1]);
+                }
+                touchAyamPrice = int.Parse(prices["touchAyam"]);
+                alfaAyamPrice = int.Parse(prices["alfaAyam"]);
+                dollarRate = int.Parse(prices["dollarRate"]);
+                losses = int.Parse(prices["5asara"]);
+
+            }
+            touchDifference = 1 - ((((25.4 * 1500) - touchAyamPrice) / 20) / 1500);
+            alfaDifference = 1 - ((((25.4 * 1500) - alfaAyamPrice) / 20) / 1500);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -80,7 +107,9 @@ namespace TotalCalculator
                 {
                     totalDolarat += phone2;
                     labelTotal.Content = totalDolarat.ToString("C2");
-                    status.Content = "Done";
+                    status.FontSize = 16;
+                    status.Foreground = Brushes.DarkGray;
+                    status.Content = "Actually " + (totalDolarat * 1500 / dollarRate).ToString("C2");
 
                     string pathPictureFormat = string.Format("{0}-{1}-{2}", dateSavedImage.Year, dateSavedImage.Month, dateSavedImage.Day);
 
@@ -127,19 +156,19 @@ namespace TotalCalculator
             MatchCollection matches;
             matches = Regex.Matches(Data, @"total   = (\d{1,5}(?:\.\d{1,2})?)", RegexOptions.Singleline);
             totalDolarat = double.Parse(matches[matches.Count - 1].Groups[1].Value);
-            matches = Regex.Matches(Data, @"(\d{1,4}(?:\.\d{1,2})?)\(MTC\) \+ (\d{1,4}(?:\.\d{1,2})?)\(Alfa\)", RegexOptions.Singleline);
+            matches = Regex.Matches(Data, @"(\d{1,5}(?:\.\d{1,2})?)\(MTC\) \+ (\d{1,4}(?:\.\d{1,2})?)\(Alfa\)", RegexOptions.Singleline);
             touchDollars = double.Parse(matches[matches.Count - 1].Groups[1].Value);
             alfaDollars = double.Parse(matches[matches.Count - 1].Groups[2].Value);
             totalDolarat -= losses + (touchDollars * touchDifference) + (alfaDollars * alfaDifference);
 
             Data = File.ReadAllText(phonesTextPath);
-            Match mat = Regex.Match(Data, @"\= (\d{3,5}\.?5?)");
+            Match mat = Regex.Match(Data, @"\= (\d{2,5}\.?5?)");
             phone1 = double.Parse(mat.Groups[1].Value);
             phone1 /= 1.5;
 
             Data = File.ReadAllText(savingPath);
             mat = Regex.Match(Data, @" (\d{2,4})\+(\d{2,5})\+(\d{2,4})\$");
-            savings += double.Parse(mat.Groups[1].Value);
+            savings += double.Parse(mat.Groups[1].Value)/1.5;  //coins money
             savings += double.Parse(mat.Groups[2].Value);
             savings += double.Parse(mat.Groups[3].Value);
 
